@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "771666312255",
+    "firebase_url": "https://ride-together-68cda-default-rtdb.firebaseio.com",
+    "project_id": "ride-together-68cda",
+    "storage_bucket": "ride-together-68cda.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771666312255:android:74b4043842c75b86088c8a",
+        "android_client_info": {
+          "package_name": "com.rideshare.ridetogether"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771666312255-uk6l6t0t9jkr4761b3m39dotib1rtlme.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRzolH1LBDrOYDBauoXewOMPEwZ-WCLec"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771666312255-uk6l6t0t9jkr4761b3m39dotib1rtlme.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771666312255:android:2623ea5e23dc6a69088c8a",
+        "android_client_info": {
+          "package_name": "com.rideshare.ridetogetheruser"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771666312255-uk6l6t0t9jkr4761b3m39dotib1rtlme.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRzolH1LBDrOYDBauoXewOMPEwZ-WCLec"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771666312255-uk6l6t0t9jkr4761b3m39dotib1rtlme.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
