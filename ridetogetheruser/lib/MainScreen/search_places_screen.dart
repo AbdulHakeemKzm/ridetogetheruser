@@ -20,7 +20,7 @@ class _SearchPlaceScreenState extends State<SearchPlaceScreen> {
   {
     if(inputText.length >1 )
       {
-        String urlAutoCompleteSearch = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$inputText&key=$mapKey&components=country:IN";
+        String urlAutoCompleteSearch = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$inputText&key=$mapKey";
 
         var responseAutoCompleteSearch = await RequestAssistant.receiveRequest(urlAutoCompleteSearch);
 
@@ -83,7 +83,7 @@ class _SearchPlaceScreenState extends State<SearchPlaceScreen> {
 
                         onTap:()
                         {
-
+                          Navigator.of(context).pop();
                         },
                         child: const Icon(Icons.arrow_back,
                         color: Colors.black,

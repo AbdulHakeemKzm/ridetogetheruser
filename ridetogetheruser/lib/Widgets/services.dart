@@ -25,12 +25,14 @@ class _ServiceTabState extends State<ServiceTab> {
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 const SizedBox(height: 100,),
                 Column(
                   children: [
                     Row(
-                      children: [
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
                         ElevatedButton(
 
                           onPressed: () => showDialog<String>(
@@ -133,6 +135,7 @@ class _ServiceTabState extends State<ServiceTab> {
                 Column(
                   children: [
                     Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           ElevatedButton(
                             onPressed: (){
@@ -201,6 +204,7 @@ class _ServiceTabState extends State<ServiceTab> {
                 Column(
                   children: [
                     Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           ElevatedButton(
                             onPressed: (){
@@ -267,6 +271,7 @@ class _ServiceTabState extends State<ServiceTab> {
                 Column(
                   children: [
                     Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           ElevatedButton(
                             onPressed: (){
