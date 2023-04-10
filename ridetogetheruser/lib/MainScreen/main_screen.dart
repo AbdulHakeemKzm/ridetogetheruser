@@ -2,15 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:ridetogetheruser/Assistants/assistant_methods.dart';
+import 'package:ridetogetheruser/Assistants/geoFireAssistant.dart';
 import 'package:ridetogetheruser/Authentication/login.dart';
 import 'package:ridetogetheruser/Global/global.dart';
 import 'package:ridetogetheruser/InfoHandler/app_info.dart';
 import 'package:ridetogetheruser/MainScreen/search_places_screen.dart';
+import 'package:ridetogetheruser/Models/activeNearbyDrivers.dart';
 import 'package:ridetogetheruser/Widgets/drawer.dart';
 import 'package:ridetogetheruser/Widgets/progress_dialog.dart';
 
@@ -52,6 +55,10 @@ class _MainScreenState extends State<MainScreen> {
   String userEmail ="Email";
 
   bool openNavigationDrawer = true;
+  bool activeNearbyDriverKeysLoaded = false;
+  BitmapDescriptor? activeNearbyIcon;
+
+
 
   blackThemeGoogleMap()
   {
@@ -245,6 +252,8 @@ class _MainScreenState extends State<MainScreen> {
     userName = userModelCurrentInfo!.name!;
     userEmail = userModelCurrentInfo!.email!;
 
+    initializeGeoFireListener();
+
   }
 
   @override
@@ -256,6 +265,9 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    createActiveNearByDriverIconMarker();
+
     return Scaffold(
       key: sKey,
       drawer: Container(
@@ -587,8 +599,103 @@ class _MainScreenState extends State<MainScreen> {
       circlesSet.add(destinationCircle);
     });
 
+  }
 
+  initializeGeoFireListener() {
+    Geofire.initialize("activeDrivers");
 
+    Geofire.queryAtLocation(
+        userCurrentPosition!.latitude,
+        userCurrentPosition!.longitude, 10)!.listen((map) {
+      print(map);
+      if (map != null) {
+        var callBack = map['callBack'];
 
+        //latitude will be retrieved from map['latitude']
+        //longitude will be retrieved from map['longitude']
+
+        switch (callBack) {
+          // driver active/online
+          case Geofire.onKeyEntered:
+            ActiveNearbyAvailableDrivers activeNearbyAvailableDriver = ActiveNearbyAvailableDrivers();
+            activeNearbyAvailableDriver.locationLatitude = map['latitude'];
+            activeNearbyAvailableDriver.locationLongitude = map['longitude'];
+            activeNearbyAvailableDriver.driverId = map['key'];
+            GeoFireAssistant.activeNearbyAvailableDriversList.add(activeNearbyAvailableDriver);
+            if(activeNearbyDriverKeysLoaded == true)
+            {
+              displayActiveDriversOnUsersMap();
+            }
+            break;
+
+          // driver non-active/offline
+          case Geofire.onKeyExited:
+            GeoFireAssistant.deleteOfflineDriverFromList(map['key']);
+            displayActiveDriversOnUsersMap();
+            break;
+            
+          // when driver move > update drivers location
+          case Geofire.onKeyMoved:
+          // Update your key's location
+            ActiveNearbyAvailableDrivers activeNearbyAvailableDriver = ActiveNearbyAvailableDrivers();
+            activeNearbyAvailableDriver.locationLatitude = map['latitude'];
+            activeNearbyAvailableDriver.locationLongitude = map['longitude'];
+            activeNearbyAvailableDriver.driverId = map['key'];
+            GeoFireAssistant.updateActiveNearbyAvailableDriverLocation(activeNearbyAvailableDriver);
+            displayActiveDriversOnUsersMap();
+            break;
+
+          //display online/active drivers on users app
+          case Geofire.onGeoQueryReady:
+          // All Intial Data is loaded
+            activeNearbyDriverKeysLoaded =true;
+            displayActiveDriversOnUsersMap();
+            break;
+        }
+      }
+
+      setState(() {});
+    });
+  }
+
+  displayActiveDriversOnUsersMap()
+  {
+
+    setState(() {
+      markersSet.clear();
+      circlesSet.clear();
+
+      Set<Marker> driversMarkerSet = Set<Marker>();
+
+      for(ActiveNearbyAvailableDrivers eachDriver in GeoFireAssistant.activeNearbyAvailableDriversList)
+      {
+        LatLng eachDriverActivePosition = LatLng(eachDriver.locationLatitude!, eachDriver.locationLongitude!);
+
+        Marker marker = Marker(
+          markerId: MarkerId("driver"+eachDriver.driverId!),
+          position: eachDriverActivePosition,
+          icon: activeNearbyIcon!,
+          // icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+          rotation: 360,
+        );
+
+        driversMarkerSet.add(marker);
+      }
+
+      setState(() {
+        markersSet = driversMarkerSet;
+      });
+    });
+  }
+  createActiveNearByDriverIconMarker()
+  {
+    if(activeNearbyIcon == null)
+    {
+      ImageConfiguration imageConfiguration = createLocalImageConfiguration(context, size: const Size(2, 2));
+      BitmapDescriptor.fromAssetImage(imageConfiguration, "assets/images/car.png").then((value)
+      {
+        activeNearbyIcon = value;
+      });
+    }
   }
 }
