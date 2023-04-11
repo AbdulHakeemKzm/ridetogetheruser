@@ -16,6 +16,7 @@ import 'package:ridetogetheruser/Global/global.dart';
 import 'package:ridetogetheruser/InfoHandler/app_info.dart';
 import 'package:ridetogetheruser/MainScreen/search_places_screen.dart';
 import 'package:ridetogetheruser/Models/activeNearbyDrivers.dart';
+import 'package:ridetogetheruser/Models/direction_details_info.dart';
 import 'package:ridetogetheruser/Widgets/drawer.dart';
 import 'package:ridetogetheruser/Widgets/progress_dialog.dart';
 
@@ -66,6 +67,7 @@ class _MainScreenState extends State<MainScreen> {
 
   List<ActiveNearbyAvailableDrivers> onlineNearByAvailableDriversList = [];
 
+  
 
 
   blackThemeGoogleMap()
@@ -565,6 +567,9 @@ class _MainScreenState extends State<MainScreen> {
     );
 
     var directionDetailsInfo = await AssistantMethods.obtainOriginToDestinationDirectionDetails(originLatLng, destinationLatLng);
+    setState(() {
+      tripDirectionDetailsInfo = directionDetailsInfo;
+    });
 
     Navigator.pop(context);
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ridetogetheruser/Assistants/assistant_methods.dart';
 import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
 
 import '../Global/global.dart';
@@ -12,6 +13,25 @@ class SelectNearestActiveDriversScreen extends StatefulWidget {
 }
 
 class _SelectNearestActiveDriversScreenState extends State<SelectNearestActiveDriversScreen> {
+
+  String fareAmount = "";
+
+  getFareAmountAccordingToVehicleType(int index){
+
+    if(tripDirectionDetailsInfo != null){
+      if( dList[index]["car_details"]["type"].toString() == "bike"){
+        fareAmount = (AssistantMethods.calculateFareAmountFromOriginToDestination(tripDirectionDetailsInfo!) / 4).toStringAsFixed(1);
+      }
+      if( dList[index]["car_details"]["type"].toString() == "car"){
+        fareAmount = AssistantMethods.calculateFareAmountFromOriginToDestination(tripDirectionDetailsInfo!).toStringAsFixed(1);
+      }
+      if( dList[index]["car_details"]["type"].toString() == "auto"){
+        fareAmount = (AssistantMethods.calculateFareAmountFromOriginToDestination(tripDirectionDetailsInfo!) / 2).toStringAsFixed(1);
+      }
+    }
+    return fareAmount;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,7 +69,7 @@ class _SelectNearestActiveDriversScreenState extends State<SelectNearestActiveDr
               leading: Padding(
                 padding: const EdgeInsets.only(top: 2.0),
                 child: Image.asset(
-                  "assets/icons/" + dList[index]["car_details"]["type"].toString() + ".png",
+                  "assets/icons/${dList[index]["car_details"]["type"]}.png",
                   width: 70,
                 ),
               ),
@@ -84,17 +104,27 @@ class _SelectNearestActiveDriversScreenState extends State<SelectNearestActiveDr
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "3",
-                    style: TextStyle(
+                   // ignore: prefer_interpolation_to_compose_strings
+                   '₹ '+ getFareAmountAccordingToVehicleType(index),
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 2,),
                   Text(
-                    "13 km",
-                    style: TextStyle(
+                    tripDirectionDetailsInfo != null ? tripDirectionDetailsInfo!.duration_text! : "",
+                    style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
+                        fontSize: 12
+                    ),
+                  ),
+                  const SizedBox(height: 2,),
+                  Text(
+                    tripDirectionDetailsInfo != null ? tripDirectionDetailsInfo!.distance_text! : "",
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black54,
                         fontSize: 12
                     ),
                   ),
