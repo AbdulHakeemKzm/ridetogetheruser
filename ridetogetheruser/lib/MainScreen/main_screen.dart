@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +18,9 @@ import 'package:ridetogetheruser/MainScreen/search_places_screen.dart';
 import 'package:ridetogetheruser/Models/activeNearbyDrivers.dart';
 import 'package:ridetogetheruser/Widgets/drawer.dart';
 import 'package:ridetogetheruser/Widgets/progress_dialog.dart';
+
+import '../main.dart';
+import 'nearestOnlineDriver.dart';
 
 
 class MainScreen extends StatefulWidget
@@ -55,8 +60,11 @@ class _MainScreenState extends State<MainScreen> {
   String userEmail ="Email";
 
   bool openNavigationDrawer = true;
+
   bool activeNearbyDriverKeysLoaded = false;
   BitmapDescriptor? activeNearbyIcon;
+
+  List<ActiveNearbyAvailableDrivers> onlineNearByAvailableDriversList = [];
 
 
 
@@ -263,6 +271,60 @@ class _MainScreenState extends State<MainScreen> {
     checkIfLocationPermissionAllowed();
   }
 
+  saveRideRequestInformation(){
+
+    //1. save the RideRequest Information
+
+    onlineNearByAvailableDriversList = GeoFireAssistant.activeNearbyAvailableDriversList;
+    searchNearestOnlineDrivers();
+  }
+
+  searchNearestOnlineDrivers() async
+  {
+    //no active driver available
+    if(onlineNearByAvailableDriversList.length == 0) {
+
+      //cancel/delete the RideRequest Information
+      setState(() {
+        polyLineSet.clear();
+        markersSet.clear();
+        circlesSet.clear();
+        pLineCoOrdinatesList.clear();
+      });
+      Fluttertoast.showToast(msg: "No Online Nearest Driver Available. Search Again after some time, Restarting App Now.");
+
+      Future.delayed(const Duration(milliseconds: 4000), ()
+      {
+        MyApp.restartApp(context);
+      });
+
+      return;
+
+    }
+    //active driver available
+    await retrieveOnlineDriversInformation(onlineNearByAvailableDriversList);
+
+    Navigator.push(context, MaterialPageRoute(builder: (c)=> SelectNearestActiveDriversScreen()));
+
+  }
+
+  retrieveOnlineDriversInformation(List onlineNearestDriversList) async
+  {
+    DatabaseReference ref = FirebaseDatabase.instance.ref().child("drivers");
+    for(int i=0; i<onlineNearestDriversList.length; i++)
+    {
+      await ref.child(onlineNearestDriversList[i].driverId.toString())
+          .once()
+          .then((dataSnapshot)
+      {
+        var driverKeyInfo = dataSnapshot.snapshot.value;
+        dList.add(driverKeyInfo);
+        print("driverKey information =" +  dList.toString());
+      });
+    }
+
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -458,7 +520,14 @@ class _MainScreenState extends State<MainScreen> {
                         ),
                         onPressed: ()
                         {
-
+                          if(Provider.of<AppInfo>(context,listen: false).userDropOffLocation != null)
+                            {
+                              saveRideRequestInformation();
+                            }
+                          else
+                            {
+                              Fluttertoast.showToast(msg: "Please select destination location");
+                            }
                         },
                         style: ElevatedButton.styleFrom(
                           primary: Colors.green,
@@ -692,7 +761,7 @@ class _MainScreenState extends State<MainScreen> {
     if(activeNearbyIcon == null)
     {
       ImageConfiguration imageConfiguration = createLocalImageConfiguration(context, size: const Size(2, 2));
-      BitmapDescriptor.fromAssetImage(imageConfiguration, "assets/images/car.png").then((value)
+      BitmapDescriptor.fromAssetImage(imageConfiguration, "assets/images/carlocation.png").then((value)
       {
         activeNearbyIcon = value;
       });
