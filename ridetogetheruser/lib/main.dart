@@ -1,17 +1,12 @@
-
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ridetogetheruser/InfoHandler/app_info.dart';
-
-import 'SplashScreen/splash_screen.dart';
-
+import 'package:ridetogetheruser/infoHandler/app_info.dart';
+import 'package:ridetogetheruser/splashScreen/splash_screen.dart';
 
 void main() async
 {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp();
 
   runApp(
@@ -19,11 +14,11 @@ void main() async
       child: ChangeNotifierProvider(
         create: (context) => AppInfo(),
         child: MaterialApp(
-          title: 'Users App',
+          title: 'Drivers App',
           theme: ThemeData(
-            primarySwatch: Colors.yellow,
+            primarySwatch: Colors.blue,
           ),
-          home: const Splash(),
+          home: const MySplashScreen(),
           debugShowCheckedModeBanner: false,
         ),
       ),
@@ -32,9 +27,11 @@ void main() async
 }
 
 
-class MyApp extends StatefulWidget {
 
+class MyApp extends StatefulWidget
+{
   final Widget? child;
+
   MyApp({this.child});
 
   static void restartApp(BuildContext context)
@@ -43,18 +40,20 @@ class MyApp extends StatefulWidget {
   }
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
-
+class _MyAppState extends State<MyApp>
+{
   Key key = UniqueKey();
+
   void restartApp()
   {
     setState(() {
       key = UniqueKey();
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return KeyedSubtree(
@@ -63,3 +62,6 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
+
+
+
